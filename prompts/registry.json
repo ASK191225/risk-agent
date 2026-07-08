@@ -1,0 +1,122 @@
+[
+  {
+    "stage": 1,
+    "agent": "context-mapper",
+    "prompt_file": "prompts/context_mapper.md",
+    "source_of_truth": ".claude/agents/context-mapper.md",
+    "version": 4,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 1 of the risk-agent pipeline. Parses a raw cyber risk scenario into structured organizational/security context (assets, tech stacks, workforce model, compliance posture, unknowns). Invoke first, right after 01_input.json exists, before assumption extraction."
+  },
+  {
+    "stage": 2,
+    "agent": "assumption-agent",
+    "prompt_file": "prompts/assumption_agent.md",
+    "source_of_truth": ".claude/agents/assumption-agent.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 2 of the risk-agent pipeline. Converts the context agent's \"unknowns\" into explicit, rated assumptions the rest of the pipeline can cite by ID. Invoke after 02_context.json exists, before risk generation."
+  },
+  {
+    "stage": 3,
+    "agent": "risk-generator",
+    "prompt_file": "prompts/risk_generator.md",
+    "source_of_truth": ".claude/agents/risk-generator.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 3 of the risk-agent pipeline. Generates 8-10 specific, distinct candidate risk scenarios from context + assumptions. Invoke after 03_assumptions.json exists, before risk review/dedup."
+  },
+  {
+    "stage": 4,
+    "agent": "risk-reviewer",
+    "prompt_file": "prompts/risk_reviewer.md",
+    "source_of_truth": ".claude/agents/risk-reviewer.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 4 of the risk-agent pipeline. Deduplicates, tightens, and rejects weak candidate risks so only genuine loss-event scenarios survive to scoring. Invoke after 04_candidate_risks.json exists, before scoring."
+  },
+  {
+    "stage": 5,
+    "agent": "risk-scorer",
+    "prompt_file": "prompts/risk_scorer.md",
+    "source_of_truth": ".claude/agents/risk-scorer.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 5 of the risk-agent pipeline. Scores every accepted risk on transparent likelihood/impact factors. Invoke after 05_reviewed_risks.json exists, before prioritization."
+  },
+  {
+    "stage": 6,
+    "agent": "prioritizer",
+    "prompt_file": "prompts/prioritizer.md",
+    "source_of_truth": ".claude/agents/prioritizer.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 6 of the risk-agent pipeline. Ranks scored risks, selects the top 5 and the single highest, and explains why #1 beat #2. Invoke after 06_scored_risks.json exists, before mitigation planning."
+  },
+  {
+    "stage": 7,
+    "agent": "mitigation-planner",
+    "prompt_file": "prompts/mitigation_planner.md",
+    "source_of_truth": ".claude/agents/mitigation-planner.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 7 of the risk-agent pipeline. Produces concrete mitigation plans (owner, effort, timeline) for every accepted risk. Invoke after 07_prioritized_risks.json exists, before residual risk estimation."
+  },
+  {
+    "stage": 8,
+    "agent": "residual-estimator",
+    "prompt_file": "prompts/residual_estimator.md",
+    "source_of_truth": ".claude/agents/residual-estimator.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 8 of the risk-agent pipeline. Estimates residual breach-likelihood reduction after proposed mitigations, as an explicitly labeled heuristic. Invoke after 08_mitigations.json exists, before framework mapping."
+  },
+  {
+    "stage": 9,
+    "agent": "framework-mapper",
+    "prompt_file": "prompts/framework_mapper.md",
+    "source_of_truth": ".claude/agents/framework-mapper.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 9 of the risk-agent pipeline. Maps each risk/mitigation to NIST CSF, ISO 27001, SOC 2, and (only if applicable) NIST AI RMF, with expected evidence types. Invoke after 09_residuals.json exists, before compliance review."
+  },
+  {
+    "stage": 10,
+    "agent": "compliance-reviewer",
+    "prompt_file": "prompts/compliance_reviewer.md",
+    "source_of_truth": ".claude/agents/compliance-reviewer.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 10 of the risk-agent pipeline. Independently critiques the Framework Mapping Agent's output for plausibility, overclaiming, and Type 1/Type 2 evidence confusion. Invoke after 10_framework_mappings.json exists, before the skeptic pass."
+  },
+  {
+    "stage": 11,
+    "agent": "skeptic",
+    "prompt_file": "prompts/skeptic.md",
+    "source_of_truth": ".claude/agents/skeptic.md",
+    "version": 2,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 11 of the risk-agent pipeline. Final adversarial pass challenging assumptions, control-effectiveness estimates, ranking, owner feasibility, and compliance claims across the whole run. Invoke after 11_compliance_review.json exists, before report composition."
+  },
+  {
+    "stage": 12,
+    "agent": "report-composer",
+    "prompt_file": "prompts/report_composer.md",
+    "source_of_truth": ".claude/agents/report-composer.md",
+    "version": 3,
+    "model": "inherit",
+    "tools": "Read, Write, Edit, Bash, Glob, Grep",
+    "description": "Stage 12 (final) of the risk-agent pipeline. Assembles every prior artifact into the human-facing final_report.md and a manifest. Invoke last, after 12_skeptic_review.json exists."
+  }
+]

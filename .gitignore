@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Generated from .claude/agents/*.md — regenerate locally, don't commit.
+PLUMBING.md
+
+# Run artifacts are generated output, not source. Keep the folder tracked
+# via .gitkeep but don't commit individual assessment runs (they may
+# contain sensitive scenario text pasted by a user).
+runs/*
+!runs/.gitkeep
+reports/*
+!reports/.gitkeep
